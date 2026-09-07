@@ -1031,7 +1031,7 @@
       context.fillRect(0, 0, world.width, world.height);
 
       // Rising sun and manga speed lines
-      context.fillStyle = css.gateFill;
+      context.fillStyle = css.accentSoft;
       context.beginPath();
       context.arc(world.width * 0.78, 150, 78, 0, Math.PI * 2);
       context.fill();
@@ -1118,7 +1118,7 @@
     }
 
     function drawToriiSection(x, y, width, height, edgeY, direction) {
-      context.fillStyle = css.accentSoft;
+      context.fillStyle = css.gateFill;
       context.strokeStyle = css.text;
       context.lineWidth = 4;
       roundedRect(x, y, width, height, 2);
