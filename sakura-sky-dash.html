@@ -219,6 +219,118 @@
     .panel h2 { margin: 0; font-size: 1.7rem; letter-spacing: 0; }
     .panel p { margin: 10px 0 22px; color: var(--cp-text-muted); line-height: 1.5; }
 
+    .splash-panel { padding-block: 38px 34px; }
+
+    .splash-mark {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      display: grid;
+      place-items: center;
+      border: 3px solid var(--cp-text);
+      border-radius: 50%;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      font-size: 2rem;
+      font-weight: 900;
+      animation: splash-pulse 800ms ease-in-out infinite alternate;
+    }
+
+    .loading-track {
+      height: 8px;
+      overflow: hidden;
+      border: 2px solid var(--cp-text);
+      border-radius: 0.625rem;
+      background: var(--cp-surface-soft);
+    }
+
+    .loading-bar {
+      width: 35%;
+      height: 100%;
+      background: var(--cp-accent);
+      animation: loading-sweep 900ms ease-in-out infinite;
+    }
+
+    .player-form { text-align: left; }
+
+    .player-form label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--cp-text-muted);
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .player-form input {
+      width: 100%;
+      min-height: 46px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border: 2px solid var(--cp-text);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .player-form input:focus { outline: 3px solid var(--cp-accent); outline-offset: 2px; }
+
+    .leaderboard {
+      margin: 20px 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--cp-border);
+      text-align: left;
+    }
+
+    .leaderboard h3 { margin: 0 0 10px; font-size: 0.82rem; text-transform: uppercase; }
+
+    .leaderboard-list { margin: 0; padding: 0; list-style: none; }
+
+    .leaderboard-list li {
+      min-height: 30px;
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: center;
+      border-bottom: 1px solid var(--cp-border);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .leaderboard-list .rank { color: var(--cp-accent); }
+    .leaderboard-list .points { font-weight: 900; }
+    .empty-score { color: var(--cp-text-muted); font-weight: 500; }
+
+    .player-result {
+      margin: 8px 0 0 !important;
+      color: var(--cp-accent) !important;
+      font-weight: 800;
+    }
+
+    .secondary-button {
+      width: 100%;
+      min-height: 44px;
+      margin-top: 12px;
+      border: 2px solid var(--cp-text);
+      border-radius: 0.625rem;
+      background: var(--cp-surface);
+      color: var(--cp-text);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    @keyframes splash-pulse {
+      from { transform: translateY(2px) rotate(-4deg); }
+      to { transform: translateY(-4px) rotate(4deg); }
+    }
+
+    @keyframes loading-sweep {
+      from { transform: translateX(-110%); }
+      to { transform: translateX(320%); }
+    }
+
     .results {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -303,6 +415,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .overlay, .panel { transition: none; }
+      .splash-mark, .loading-bar { animation: none; }
     }
   </style>
 </head>
@@ -324,22 +437,43 @@
     <div class="score" id="score" aria-live="polite">0</div>
     <p class="hint" id="hint">Space, click, or tap to dash</p>
 
-    <section class="overlay visible" id="startOverlay" aria-labelledby="startTitle">
+    <section class="overlay visible" id="splashOverlay" aria-labelledby="splashTitle">
+      <div class="panel splash-panel">
+        <div class="splash-mark" aria-hidden="true">桜</div>
+        <h2 id="splashTitle">Sakura Sky Dash</h2>
+        <p>Awakening the wind...</p>
+        <div class="loading-track" role="progressbar" aria-label="Loading game">
+          <div class="loading-bar"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="overlay" id="startOverlay" aria-labelledby="startTitle">
       <div class="panel">
         <h2 id="startTitle">Take to the skyline</h2>
-        <p>Clear the torii gates and ride the wind.</p>
-        <button class="primary-button" id="startButton" type="button">Begin the dash</button>
+        <p>Choose your player name and clear the torii gates.</p>
+        <form class="player-form" id="playerForm">
+          <label for="nicknameInput">Player nickname</label>
+          <input id="nicknameInput" name="nickname" type="text" maxlength="16" autocomplete="nickname" placeholder="Enter a nickname" required>
+          <button class="primary-button" id="startButton" type="submit">Begin the dash</button>
+        </form>
+        <section class="leaderboard" aria-labelledby="leaderboardTitle">
+          <h3 id="leaderboardTitle">High scores</h3>
+          <ol class="leaderboard-list" id="leaderboardList"></ol>
+        </section>
       </div>
     </section>
 
     <section class="overlay" id="gameOverOverlay" aria-labelledby="gameOverTitle">
       <div class="panel">
         <h2 id="gameOverTitle">Dash ended</h2>
+        <p class="player-result" id="playerResult"></p>
         <div class="results">
           <div class="result"><span>Score</span><strong id="finalScore">0</strong></div>
           <div class="result"><span>Best</span><strong id="finalBest">0</strong></div>
         </div>
         <button class="primary-button" id="restartButton" type="button">Dash again</button>
+        <button class="secondary-button" id="menuButton" type="button">Player menu</button>
       </div>
     </section>
   </main>
@@ -351,10 +485,16 @@
     const bestScoreElement = document.getElementById("bestScore");
     const finalScoreElement = document.getElementById("finalScore");
     const finalBestElement = document.getElementById("finalBest");
+    const splashOverlay = document.getElementById("splashOverlay");
     const startOverlay = document.getElementById("startOverlay");
     const gameOverOverlay = document.getElementById("gameOverOverlay");
     const startButton = document.getElementById("startButton");
     const restartButton = document.getElementById("restartButton");
+    const menuButton = document.getElementById("menuButton");
+    const playerForm = document.getElementById("playerForm");
+    const nicknameInput = document.getElementById("nicknameInput");
+    const leaderboardList = document.getElementById("leaderboardList");
+    const playerResult = document.getElementById("playerResult");
     const soundButton = document.getElementById("soundButton");
     const soundOnIcon = document.getElementById("soundOnIcon");
     const soundOffIcon = document.getElementById("soundOffIcon");
@@ -365,7 +505,9 @@
     const pipes = [];
     let state = "ready";
     let score = 0;
-    let bestScore = Number.parseInt(location.hash.slice(1), 10) || 0;
+    let leaderboard = loadLeaderboard();
+    let activeNickname = localStorage.getItem("sakuraSkyDashNickname") || "";
+    let bestScore = leaderboard[0]?.score || 0;
     let muted = false;
     let lastTime = 0;
     let spawnTimer = 0;
@@ -376,6 +518,59 @@
     let css;
 
     const melody = [293.66, 349.23, 392, 440, 392, 349.23, 293.66, 261.63, 293.66, 392, 440, 523.25, 440, 392, 349.23, 293.66];
+
+    function loadLeaderboard() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("sakuraSkyDashLeaderboard") || "[]");
+        return Array.isArray(saved) ? saved.filter(entry => entry && typeof entry.name === "string" && Number.isFinite(entry.score)) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function renderLeaderboard() {
+      leaderboard.sort((left, right) => right.score - left.score || left.name.localeCompare(right.name));
+      leaderboardList.replaceChildren();
+      const leaders = leaderboard.slice(0, 5);
+      if (!leaders.length) {
+        const item = document.createElement("li");
+        item.className = "empty-score";
+        item.textContent = "No scores yet. Be the first.";
+        leaderboardList.append(item);
+        return;
+      }
+      leaders.forEach((entry, index) => {
+        const item = document.createElement("li");
+        const rank = document.createElement("span");
+        const name = document.createElement("span");
+        const points = document.createElement("span");
+        rank.className = "rank";
+        points.className = "points";
+        rank.textContent = `${index + 1}.`;
+        name.textContent = entry.name;
+        points.textContent = entry.score;
+        item.append(rank, name, points);
+        leaderboardList.append(item);
+      });
+    }
+
+    function savePlayerScore() {
+      if (!activeNickname) return false;
+      const existing = leaderboard.find(entry => entry.name.toLocaleLowerCase() === activeNickname.toLocaleLowerCase());
+      const previousScore = existing?.score || 0;
+      if (score <= previousScore) return false;
+      if (existing) {
+        existing.name = activeNickname;
+        existing.score = score;
+      } else {
+        leaderboard.push({ name: activeNickname, score });
+      }
+      leaderboard.sort((left, right) => right.score - left.score || left.name.localeCompare(right.name));
+      localStorage.setItem("sakuraSkyDashLeaderboard", JSON.stringify(leaderboard.slice(0, 20)));
+      bestScore = leaderboard[0]?.score || 0;
+      renderLeaderboard();
+      return true;
+    }
 
     function refreshColors() {
       const styles = getComputedStyle(document.documentElement);
@@ -432,11 +627,16 @@
     function endGame() {
       if (state !== "playing") return;
       state = "over";
-      bestScore = Math.max(bestScore, score);
-      location.hash = String(bestScore);
+      const previousOverallBest = bestScore;
+      const playerImproved = savePlayerScore();
       bestScoreElement.textContent = bestScore;
       finalScoreElement.textContent = score;
       finalBestElement.textContent = bestScore;
+      playerResult.textContent = score > previousOverallBest
+        ? `New high score for ${activeNickname}!`
+        : playerImproved
+          ? `${activeNickname}'s new personal best!`
+          : `${activeNickname}'s score`;
       playTone(145, 0.18, "sawtooth");
       window.setTimeout(() => gameOverOverlay.classList.add("visible"), 320);
     }
@@ -867,14 +1067,31 @@
 
     function handleAction(event) {
       if (event.type === "keydown" && !["Space", "ArrowUp", "KeyW", "Enter"].includes(event.code)) return;
-      if (event.target.closest?.("button")) return;
+      if (event.target.closest?.("button, input")) return;
       event.preventDefault();
-      if (state === "ready") startGame();
-      else if (state === "playing") flap();
+      if (state === "playing") flap();
     }
 
-    startButton.addEventListener("click", startGame);
+    playerForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const nickname = nicknameInput.value.trim().replace(/\s+/g, " ");
+      if (!nickname) {
+        nicknameInput.focus();
+        return;
+      }
+      activeNickname = nickname;
+      localStorage.setItem("sakuraSkyDashNickname", activeNickname);
+      startGame();
+    });
     restartButton.addEventListener("click", startGame);
+    menuButton.addEventListener("click", () => {
+      state = "ready";
+      gameOverOverlay.classList.remove("visible");
+      startOverlay.classList.add("visible");
+      hint.hidden = false;
+      renderLeaderboard();
+      nicknameInput.focus();
+    });
     canvas.addEventListener("pointerdown", handleAction);
     window.addEventListener("keydown", handleAction);
     window.addEventListener("resize", resizeCanvas);
@@ -893,11 +1110,18 @@
       soundButton.title = muted ? "Turn on sound" : "Mute sound";
     });
 
+    nicknameInput.value = activeNickname;
     bestScoreElement.textContent = bestScore;
+    renderLeaderboard();
     refreshColors();
     resizeCanvas();
     resetGame();
     requestAnimationFrame(gameLoop);
+    window.setTimeout(() => {
+      splashOverlay.classList.remove("visible");
+      startOverlay.classList.add("visible");
+      nicknameInput.focus();
+    }, 1100);
   </script>
 </body>
 </html>
