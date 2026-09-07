@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">Sakura Sky Dash</title>
+  <circle cx="48" cy="48" r="42" fill="#f4dce4" stroke="#242424" stroke-width="6"/>
+  <path d="M12 59h25M17 69h24M23 79h17" fill="none" stroke="#242424" stroke-width="5" stroke-linecap="round"/>
+  <g fill="#b11f4b" stroke="#242424" stroke-width="3" stroke-linejoin="round">
+    <path d="M54 42c-12-5-13-18-4-26 10 3 15 14 8 25z"/>
+    <path d="M57 44c5-12 18-13 26-4-3 10-14 15-25 8z"/>
+    <path d="M56 49c12 5 13 18 4 26-10-3-15-14-8-25z"/>
+    <path d="M51 48c-5 12-18 13-26 4 3-10 14-15 25-8z"/>
+    <path d="M53 44c-5-10 1-20 12-21 7 8 5 19-7 24z"/>
+  </g>
+  <circle cx="54" cy="46" r="7" fill="#f59e0b" stroke="#242424" stroke-width="3"/>
+</svg>
