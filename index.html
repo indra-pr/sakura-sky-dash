@@ -398,7 +398,7 @@
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(canvas.clientWidth * ratio);
       canvas.height = Math.round(canvas.clientHeight * ratio);
-      world.width = Math.max(340, Math.min(480, world.height * canvas.clientWidth / canvas.clientHeight));
+      world.width = world.height * canvas.clientWidth / canvas.clientHeight;
       bird.x = world.width * 0.28;
       context.setTransform(canvas.width / world.width, 0, 0, canvas.height / world.height, 0, 0);
     }
