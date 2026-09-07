@@ -1,10 +1,12 @@
 # Shared leaderboard setup
 
-Sakura Sky Dash can use Supabase for one leaderboard shared by every browser. Until these steps are completed, the game continues to use browser-local scores.
+Sakura Sky Dash uses Supabase for one leaderboard shared by every browser. The active project is `platttigweyjumrmjymo` in the Southeast Asia region.
 
-## 1. Create the database
+The game keeps browser-local scores only as an offline fallback when Supabase is unavailable.
 
-Create a free Supabase project, open **SQL Editor**, and run:
+## Database schema
+
+The following schema has been applied to the active project. Keep it here for recovery or recreation:
 
 ```sql
 create table public.sakura_sky_dash_scores (
@@ -59,18 +61,18 @@ revoke all on function public.submit_sakura_score(text, integer) from public;
 grant execute on function public.submit_sakura_score(text, integer) to anon, authenticated;
 ```
 
-## 2. Connect the game
+## Game connection
 
-In both `index.html` and `sakura-sky-dash.html`, find `sharedScoreConfig` and insert the values from **Project Settings > API**:
+Both `index.html` and `sakura-sky-dash.html` contain the active project URL and browser-safe publishable key in `sharedScoreConfig`:
 
 ```js
 const sharedScoreConfig = {
-  url: "https://YOUR_PROJECT.supabase.co",
-  anonKey: "YOUR_PUBLIC_ANON_KEY"
+  url: "https://platttigweyjumrmjymo.supabase.co",
+  anonKey: "YOUR_PUBLIC_PUBLISHABLE_KEY"
 };
 ```
 
-The anon key is intended for browser use and is constrained by the database policies above. Never put the Supabase service-role key in HTML or commit it to GitHub.
+The publishable key is intended for browser use and is constrained by the database policies above. Never put a Supabase secret or service-role key in HTML or commit it to GitHub.
 
 ## Behavior
 

@@ -644,8 +644,8 @@
     const bird = { x: 132, y: 320, radius: 17, velocity: 0, rotation: 0 };
     const pipes = [];
     const sharedScoreConfig = {
-      url: "",
-      anonKey: ""
+      url: "https://platttigweyjumrmjymo.supabase.co",
+      anonKey: "sb_publishable_cue6SvW598hAWc1pFLmgxA_iwzwJevx"
     };
     let state = "ready";
     let score = 0;
@@ -681,7 +681,6 @@
     function sharedScoreHeaders() {
       return {
         apikey: sharedScoreConfig.anonKey,
-        Authorization: `Bearer ${sharedScoreConfig.anonKey}`,
         "Content-Type": "application/json"
       };
     }
