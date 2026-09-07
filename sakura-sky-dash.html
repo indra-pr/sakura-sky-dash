@@ -1345,7 +1345,7 @@
       if (event.target.closest?.("button, input")) return;
       event.preventDefault();
       if (state === "playing") {
-        if (event.type === "pointerdown" && event.pointerType === "touch") navigator.vibrate?.(12);
+        if (event.type === "pointerdown" && event.pointerType === "touch") navigator.vibrate?.(30);
         flap();
       }
     }
