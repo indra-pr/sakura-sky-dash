@@ -321,6 +321,51 @@
       cursor: pointer;
     }
 
+    .menu-about-button { margin-top: 0; }
+
+    .about-emblem {
+      width: 58px;
+      height: 58px;
+      margin: 2px auto 16px;
+      display: grid;
+      place-items: center;
+      border: 3px solid var(--cp-text);
+      border-radius: 50%;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      font-size: 1.6rem;
+      font-weight: 900;
+      transform: rotate(-5deg);
+    }
+
+    .about-copy { text-align: left; }
+
+    .about-copy p { margin-bottom: 14px; }
+
+    .developer-credit {
+      margin: 18px 0 !important;
+      padding: 12px 14px;
+      border-left: 5px solid var(--cp-accent);
+      background: var(--cp-surface-soft);
+      color: var(--cp-text) !important;
+    }
+
+    .developer-credit span {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--cp-text-muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    @media (max-height: 620px) {
+      .about-panel { padding: 20px 24px; }
+      .about-emblem { width: 48px; height: 48px; margin-bottom: 10px; font-size: 1.35rem; }
+      .about-copy p { margin: 8px 0 10px; line-height: 1.35; }
+      .developer-credit { margin: 12px 0 !important; padding-block: 9px; }
+    }
+
     @keyframes splash-pulse {
       from { transform: translateY(2px) rotate(-4deg); }
       to { transform: translateY(-4px) rotate(4deg); }
@@ -461,6 +506,20 @@
           <h3 id="leaderboardTitle">High scores</h3>
           <ol class="leaderboard-list" id="leaderboardList"></ol>
         </section>
+        <button class="secondary-button menu-about-button" id="aboutButton" type="button">About the game</button>
+      </div>
+    </section>
+
+    <section class="overlay" id="aboutOverlay" aria-labelledby="aboutTitle">
+      <div class="panel about-panel">
+        <div class="about-emblem" aria-hidden="true">風</div>
+        <h2 id="aboutTitle">About the game</h2>
+        <div class="about-copy">
+          <p><strong>Sakura Sky Dash</strong> is an anime-inspired skyline adventure where a young wind runner dashes between towering torii gates.</p>
+          <p>Ride the breeze above a moonlit Japanese city, weave through falling sakura petals, and chase a place at the top of the local leaderboard.</p>
+          <p class="developer-credit"><span>Developed by</span>Indra Permana Rusli</p>
+        </div>
+        <button class="primary-button" id="closeAboutButton" type="button">Return to players</button>
       </div>
     </section>
 
@@ -487,10 +546,13 @@
     const finalBestElement = document.getElementById("finalBest");
     const splashOverlay = document.getElementById("splashOverlay");
     const startOverlay = document.getElementById("startOverlay");
+    const aboutOverlay = document.getElementById("aboutOverlay");
     const gameOverOverlay = document.getElementById("gameOverOverlay");
     const startButton = document.getElementById("startButton");
     const restartButton = document.getElementById("restartButton");
     const menuButton = document.getElementById("menuButton");
+    const aboutButton = document.getElementById("aboutButton");
+    const closeAboutButton = document.getElementById("closeAboutButton");
     const playerForm = document.getElementById("playerForm");
     const nicknameInput = document.getElementById("nicknameInput");
     const leaderboardList = document.getElementById("leaderboardList");
@@ -1084,6 +1146,16 @@
       startGame();
     });
     restartButton.addEventListener("click", startGame);
+    aboutButton.addEventListener("click", () => {
+      startOverlay.classList.remove("visible");
+      aboutOverlay.classList.add("visible");
+      window.setTimeout(() => closeAboutButton.focus(), 200);
+    });
+    closeAboutButton.addEventListener("click", () => {
+      aboutOverlay.classList.remove("visible");
+      startOverlay.classList.add("visible");
+      window.setTimeout(() => aboutButton.focus(), 200);
+    });
     menuButton.addEventListener("click", () => {
       state = "ready";
       gameOverOverlay.classList.remove("visible");
