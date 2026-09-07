@@ -878,8 +878,14 @@
         : playerImproved
           ? `${activeNickname}'s new personal best!${rankMessage}`
           : `${activeNickname}'s score.${rankMessage}`;
-      playTone(145, 0.18, "sawtooth");
+      playCrashSound();
       window.setTimeout(() => gameOverOverlay.classList.add("visible"), 320);
+    }
+
+    function playCrashSound() {
+      playTone(174.61, 0.16, "sawtooth");
+      window.setTimeout(() => playTone(130.81, 0.14, "triangle"), 105);
+      window.setTimeout(() => playTone(261.63, 0.22, "triangle"), 235);
     }
 
     function playTone(frequency, duration, type) {
