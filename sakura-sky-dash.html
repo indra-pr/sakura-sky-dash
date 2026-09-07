@@ -686,6 +686,7 @@
     let lastTime = 0;
     let spawnTimer = 0;
     let idleTime = 0;
+    let crashStartedAt = -1;
     let blinkStartedAt = -1;
     let nextBlinkAt = 1.8 + Math.random() * 2.4;
     let audioContext;
@@ -838,6 +839,7 @@
     }
 
     function resetGame() {
+      crashStartedAt = -1;
       bird.y = world.height * 0.45;
       bird.velocity = 0;
       bird.rotation = 0;
@@ -866,6 +868,7 @@
     function endGame() {
       if (state !== "playing") return;
       state = "over";
+      crashStartedAt = idleTime;
       const previousOverallBest = bestScore;
       const playerImproved = savePlayerScore();
       const playerRank = leaderboard.findIndex(entry => entry.name.toLocaleLowerCase() === activeNickname.toLocaleLowerCase());
@@ -879,7 +882,7 @@
           ? `${activeNickname}'s new personal best!${rankMessage}`
           : `${activeNickname}'s score.${rankMessage}`;
       playCrashSound();
-      window.setTimeout(() => gameOverOverlay.classList.add("visible"), 320);
+      window.setTimeout(() => gameOverOverlay.classList.add("visible"), 720);
     }
 
     function playCrashSound() {
@@ -1204,14 +1207,18 @@
 
     function drawBird() {
       const hover = state === "ready" ? Math.sin(idleTime * 4) * 7 : 0;
-      const drawY = bird.y + hover;
+      const crashElapsed = state === "over" ? idleTime - crashStartedAt : -1;
+      const shocked = crashElapsed >= 0 && crashElapsed < 0.42;
+      const crying = crashElapsed >= 0.42;
+      const tremble = state === "over" ? Math.sin(crashElapsed * 58) * (shocked ? 3 : 1.4) : 0;
+      const drawY = bird.y + hover + (crying ? Math.sin(crashElapsed * 16) * 1.5 : 0);
       const wingLift = Math.sin(idleTime * 18) * 4;
       const jumpPower = state === "playing" ? Math.max(0, Math.min(1, -bird.velocity / 440)) : 0;
       const hairLift = jumpPower * 5;
       const hairSweep = jumpPower * 3;
       context.save();
-      context.translate(bird.x, drawY);
-      context.rotate(state === "playing" ? bird.rotation * 0.42 : -0.12);
+      context.translate(bird.x + tremble, drawY);
+      context.rotate(state === "playing" ? bird.rotation * 0.42 : state === "over" ? 0.18 + tremble * 0.012 : -0.12);
 
       // Flowing scarf
       context.fillStyle = css.accent;
@@ -1289,34 +1296,83 @@
       context.fill();
       context.stroke();
 
-      // Large eye and determined brow
+      // Face changes from determined to shocked, then crying, after impact.
       const eyeY = -5 - jumpPower;
       const blinkAmount = getBlinkAmount();
       const eyeHeight = Math.max(0.7, (8 + jumpPower * 2) * (1 - blinkAmount));
-      context.fillStyle = css.surface;
-      context.beginPath();
-      context.ellipse(10, eyeY, 6 + jumpPower, eyeHeight, 0.15, 0, Math.PI * 2);
-      context.fill();
-      context.stroke();
-      if (blinkAmount < 0.72) {
-        context.fillStyle = css.text;
+      if (shocked) {
+        context.strokeStyle = css.text;
+        context.lineWidth = 2.6;
         context.beginPath();
-        context.arc(12, -4 - jumpPower * 2, (3 + jumpPower * 0.5) * (1 - blinkAmount), 0, Math.PI * 2);
-        context.fill();
+        context.moveTo(5, -10);
+        context.lineTo(15, 0);
+        context.moveTo(15, -10);
+        context.lineTo(5, 0);
+        context.stroke();
         context.fillStyle = css.surface;
         context.beginPath();
-        context.arc(13, -6 - jumpPower * 2, (1.2 + jumpPower * 0.4) * (1 - blinkAmount), 0, Math.PI * 2);
+        context.arc(14, 6, 4.5, 0, Math.PI * 2);
         context.fill();
+        context.stroke();
+      } else if (crying) {
+        const tearDrop = (idleTime * 55) % 15;
+        context.strokeStyle = css.text;
+        context.lineWidth = 2.6;
+        context.beginPath();
+        context.moveTo(4, -5);
+        context.quadraticCurveTo(10, 0, 16, -5);
+        context.stroke();
+        context.fillStyle = "#58b8e8";
+        context.strokeStyle = css.text;
+        for (const offset of [0, 7]) {
+          context.beginPath();
+          context.ellipse(7 + offset, 1 + tearDrop + offset * 0.35, 2.8, 5.8, 0.12, 0, Math.PI * 2);
+          context.fill();
+          context.stroke();
+        }
+        context.strokeStyle = css.text;
+        context.beginPath();
+        context.moveTo(8, 10);
+        context.quadraticCurveTo(13, 5 + Math.sin(idleTime * 24) * 1.5, 18, 10);
+        context.stroke();
+      } else {
+        context.fillStyle = css.surface;
+        context.beginPath();
+        context.ellipse(10, eyeY, 6 + jumpPower, eyeHeight, 0.15, 0, Math.PI * 2);
+        context.fill();
+        context.stroke();
+        if (blinkAmount < 0.72) {
+          context.fillStyle = css.text;
+          context.beginPath();
+          context.arc(12, -4 - jumpPower * 2, (3 + jumpPower * 0.5) * (1 - blinkAmount), 0, Math.PI * 2);
+          context.fill();
+          context.fillStyle = css.surface;
+          context.beginPath();
+          context.arc(13, -6 - jumpPower * 2, (1.2 + jumpPower * 0.4) * (1 - blinkAmount), 0, Math.PI * 2);
+          context.fill();
+        }
+
+        context.strokeStyle = css.text;
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(5, -14 - jumpPower * 2);
+        context.lineTo(15, -16 - jumpPower * 2);
+        context.moveTo(10, 5);
+        context.quadraticCurveTo(15, 8, 18, 3);
+        context.stroke();
       }
 
-      context.strokeStyle = css.text;
-      context.lineWidth = 2;
-      context.beginPath();
-      context.moveTo(5, -14 - jumpPower * 2);
-      context.lineTo(15, -16 - jumpPower * 2);
-      context.moveTo(10, 5);
-      context.quadraticCurveTo(15, 8, 18, 3);
-      context.stroke();
+      if (shocked) {
+        context.strokeStyle = css.accent;
+        context.lineWidth = 3;
+        for (let index = 0; index < 6; index += 1) {
+          const angle = index / 6 * Math.PI * 2;
+          context.beginPath();
+          context.moveTo(Math.cos(angle) * 25 + 2, Math.sin(angle) * 25 - 5);
+          context.lineTo(Math.cos(angle) * 34 + 2, Math.sin(angle) * 34 - 5);
+          context.stroke();
+        }
+      }
 
       // Wind streaks reinforce forward motion
       context.strokeStyle = css.border;
@@ -1332,10 +1388,22 @@
 
     function draw() {
       context.clearRect(0, 0, world.width, world.height);
+      const crashElapsed = state === "over" ? idleTime - crashStartedAt : -1;
+      const shakeStrength = crashElapsed >= 0 && crashElapsed < 0.32 ? (1 - crashElapsed / 0.32) * 11 : 0;
+      context.save();
+      context.translate(Math.sin(crashElapsed * 92) * shakeStrength, Math.cos(crashElapsed * 77) * shakeStrength * 0.55);
       drawBackground();
       drawPipes();
       drawGround();
       drawBird();
+      context.restore();
+      if (crashElapsed >= 0 && crashElapsed < 0.16) {
+        context.save();
+        context.globalAlpha = (1 - crashElapsed / 0.16) * 0.34;
+        context.fillStyle = css.surface;
+        context.fillRect(0, 0, world.width, world.height);
+        context.restore();
+      }
     }
 
     function gameLoop(time) {
