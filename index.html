@@ -27,6 +27,7 @@
       --cp-accent: #b11f4b;
       --cp-accent-hover: #9a1a41;
       --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-gate-fill: #f4dce4;
       --cp-accent-fg: #ffffff;
       --cp-success: #16a34a;
       --cp-danger: #dc2626;
@@ -53,6 +54,7 @@
       --cp-accent: #fd8ea1;
       --cp-accent-hover: #fb7b91;
       --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-gate-fill: #633846;
       --cp-accent-fg: #1a1a1a;
       --cp-success: #4ade80;
       --cp-danger: #f87171;
@@ -818,6 +820,7 @@
         muted: styles.getPropertyValue("--cp-text-muted").trim(),
         accent: styles.getPropertyValue("--cp-accent").trim(),
         accentSoft: styles.getPropertyValue("--cp-accent-soft").trim(),
+        gateFill: styles.getPropertyValue("--cp-gate-fill").trim(),
         sheen: styles.getPropertyValue("--cp-sheen").trim(),
         warning: styles.getPropertyValue("--cp-warning").trim(),
         success: styles.getPropertyValue("--cp-success").trim()
@@ -1028,7 +1031,7 @@
       context.fillRect(0, 0, world.width, world.height);
 
       // Rising sun and manga speed lines
-      context.fillStyle = css.accentSoft;
+      context.fillStyle = css.gateFill;
       context.beginPath();
       context.arc(world.width * 0.78, 150, 78, 0, Math.PI * 2);
       context.fill();
