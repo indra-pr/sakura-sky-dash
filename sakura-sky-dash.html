@@ -314,7 +314,23 @@
 
     .leaderboard h3 { margin: 0 0 10px; font-size: 0.82rem; text-transform: uppercase; }
 
-    .leaderboard-list { margin: 0; padding: 0; list-style: none; }
+    .leaderboard-list {
+      max-height: 150px;
+      margin: 0;
+      padding: 0 8px 0 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-color: var(--cp-accent) var(--cp-surface-soft);
+      scrollbar-width: thin;
+      touch-action: pan-y;
+      list-style: none;
+    }
+
+    .leaderboard-list:focus-visible { outline: 3px solid var(--cp-accent); outline-offset: 3px; }
+
+    .leaderboard-list::-webkit-scrollbar { width: 8px; }
+    .leaderboard-list::-webkit-scrollbar-track { background: var(--cp-surface-soft); }
+    .leaderboard-list::-webkit-scrollbar-thumb { border-radius: 0.625rem; background: var(--cp-accent); }
 
     .leaderboard-list li {
       min-height: 30px;
@@ -328,6 +344,9 @@
 
     .leaderboard-list .rank { color: var(--cp-accent); }
     .leaderboard-list .points { font-weight: 900; }
+    .leaderboard-list li:nth-child(-n + 3) .rank,
+    .leaderboard-list li:nth-child(-n + 3) .points { color: var(--cp-warning); }
+    .leaderboard-list .current-player { background: var(--cp-accent-soft); }
     .empty-score { color: var(--cp-text-muted); font-weight: 500; }
 
     .player-result {
@@ -346,7 +365,27 @@
       text-transform: uppercase;
     }
 
+    .menu-actions {
+      display: grid;
+      grid-template-columns: 1fr 48px;
+      gap: 12px;
+    }
+
     .menu-about-button { margin-top: 0; }
+
+    .menu-sound-button {
+      width: 48px;
+      height: 48px;
+      margin: 0;
+      align-self: end;
+    }
+
+    .menu-sound-button.is-muted {
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+    }
+
+    .menu-sound-button.is-muted:hover { background: var(--cp-accent-hover); }
 
     .about-emblem {
       width: 58px;
@@ -385,6 +424,10 @@
     }
 
     @media (max-height: 620px) {
+      .start-panel { padding: 20px 24px; }
+      .start-panel > p { margin: 8px 0 12px; line-height: 1.35; }
+      .start-panel .leaderboard { margin: 12px 0; padding-top: 10px; }
+      .start-panel .leaderboard-list { max-height: 90px; }
       .about-panel { padding: 20px 24px; }
       .about-emblem { width: 48px; height: 48px; margin-bottom: 10px; font-size: 1.35rem; }
       .about-copy p { margin: 8px 0 10px; line-height: 1.35; }
@@ -490,10 +533,6 @@
         <h1>Sakura Sky Dash</h1>
         <p class="best">Best <span id="bestScore">0</span></p>
       </div>
-      <button class="icon-button" id="soundButton" type="button" aria-label="Mute sound" title="Mute sound">
-        <svg id="soundOnIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zm-2.5-8.5v2.06a7 7 0 0 1 0 12.88v2.06a9 9 0 0 0 0-17z"/></svg>
-        <svg id="soundOffIcon" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="m19.59 3 1.41 1.41L4.41 21 3 19.59 7.59 15H3V9h4l5-4v5.59L19.59 3zM14 8v-2.7l-1 .8v2.9L14 8zm0 8v2.7l-2-1.6v-3.1l2-2 2.5 2.5c-.6.7-1.5 1.2-2.5 1.5zm3.91 1.91 1.45 1.45A8.96 8.96 0 0 0 23 12a9 9 0 0 0-5.17-8.14l-1.51 1.51A7 7 0 0 1 21 12c0 2.31-1.12 4.36-2.84 5.64l-.25.27z"/></svg>
-      </button>
     </div>
 
     <div class="score" id="score" aria-live="polite">0</div>
@@ -511,7 +550,7 @@
     </section>
 
     <section class="overlay" id="startOverlay" aria-labelledby="startTitle">
-      <div class="panel">
+      <div class="panel start-panel">
         <h2 id="startTitle">Take to the skyline</h2>
         <p>Choose your player name and clear the torii gates.</p>
         <form class="player-form" id="playerForm">
@@ -521,9 +560,18 @@
         </form>
         <section class="leaderboard" aria-labelledby="leaderboardTitle">
           <h3 id="leaderboardTitle">High scores</h3>
-          <ol class="leaderboard-list" id="leaderboardList"></ol>
+          <ol class="leaderboard-list" id="leaderboardList" tabindex="0" aria-label="Top 20 high scores"></ol>
         </section>
-        <button class="secondary-button menu-about-button" id="aboutButton" type="button">ABOUT THE GAME</button>
+        <div class="menu-actions">
+          <button class="secondary-button menu-about-button" id="aboutButton" type="button">ABOUT THE GAME</button>
+          <button class="icon-button menu-sound-button" id="soundButton" type="button" aria-label="Mute sound" title="Mute sound">
+            <svg id="soundOnIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zm-2.5-8.5v2.06a7 7 0 0 1 0 12.88v2.06a9 9 0 0 0 0-17z"/></svg>
+            <svg id="soundOffIcon" viewBox="0 0 24 24" aria-hidden="true" hidden>
+              <path d="M3 9v6h4l5 4V5L7 9H3z"/>
+              <path d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -533,7 +581,7 @@
         <h2 id="aboutTitle">ABOUT THE GAME</h2>
         <div class="about-copy">
           <p><strong>Sakura Sky Dash</strong> is an anime-inspired skyline adventure where a young wind runner dashes between towering torii gates.</p>
-          <p>Ride the breeze above a moonlit Japanese city, weave through falling sakura petals, and chase a place at the top of the local leaderboard.</p>
+          <p>Ride the breeze above a moonlit Japanese city, weave through falling sakura petals, and chase a place at the top of the leaderboard.</p>
           <p class="developer-credit"><span>Developed by</span>Indra Permana Rusli</p>
         </div>
         <button class="primary-button" id="closeAboutButton" type="button">Return to home</button>
@@ -582,6 +630,10 @@
     const world = { width: 480, height: 720, groundHeight: 82 };
     const bird = { x: 132, y: 320, radius: 17, velocity: 0, rotation: 0 };
     const pipes = [];
+    const sharedScoreConfig = {
+      url: "",
+      anonKey: ""
+    };
     let state = "ready";
     let score = 0;
     let leaderboard = loadLeaderboard();
@@ -591,6 +643,8 @@
     let lastTime = 0;
     let spawnTimer = 0;
     let idleTime = 0;
+    let blinkStartedAt = -1;
+    let nextBlinkAt = 1.8 + Math.random() * 2.4;
     let audioContext;
     let musicTimer;
     let musicStep = 0;
@@ -607,10 +661,56 @@
       }
     }
 
+    function sharedScoresEnabled() {
+      return sharedScoreConfig.url.startsWith("https://") && sharedScoreConfig.anonKey.length > 20;
+    }
+
+    function sharedScoreHeaders() {
+      return {
+        apikey: sharedScoreConfig.anonKey,
+        Authorization: `Bearer ${sharedScoreConfig.anonKey}`,
+        "Content-Type": "application/json"
+      };
+    }
+
+    async function loadSharedLeaderboard() {
+      if (!sharedScoresEnabled()) return;
+      try {
+        const response = await fetch(`${sharedScoreConfig.url}/rest/v1/sakura_sky_dash_scores?select=nickname,score&order=score.desc,nickname.asc&limit=20`, {
+          headers: sharedScoreHeaders()
+        });
+        if (!response.ok) throw new Error(`Leaderboard request failed: ${response.status}`);
+        const scores = await response.json();
+        leaderboard = scores
+          .filter(entry => entry && typeof entry.nickname === "string" && Number.isFinite(entry.score))
+          .map(entry => ({ name: entry.nickname, score: entry.score }));
+        bestScore = leaderboard[0]?.score || 0;
+        bestScoreElement.textContent = bestScore;
+        renderLeaderboard();
+      } catch (error) {
+        console.warn("Shared leaderboard unavailable; using scores saved on this device.", error);
+      }
+    }
+
+    async function submitSharedScore(playerScore) {
+      if (!sharedScoresEnabled() || !activeNickname) return;
+      try {
+        const response = await fetch(`${sharedScoreConfig.url}/rest/v1/rpc/submit_sakura_score`, {
+          method: "POST",
+          headers: sharedScoreHeaders(),
+          body: JSON.stringify({ player_name: activeNickname, player_score: playerScore })
+        });
+        if (!response.ok) throw new Error(`Score submission failed: ${response.status}`);
+        await loadSharedLeaderboard();
+      } catch (error) {
+        console.warn("Shared score could not be saved; it remains saved on this device.", error);
+      }
+    }
+
     function renderLeaderboard() {
       leaderboard.sort((left, right) => right.score - left.score || left.name.localeCompare(right.name));
       leaderboardList.replaceChildren();
-      const leaders = leaderboard.slice(0, 5);
+      const leaders = leaderboard.slice(0, 20);
       if (!leaders.length) {
         const item = document.createElement("li");
         item.className = "empty-score";
@@ -628,6 +728,10 @@
         rank.textContent = `${index + 1}.`;
         name.textContent = entry.name;
         points.textContent = entry.score;
+        if (activeNickname && entry.name.toLocaleLowerCase() === activeNickname.toLocaleLowerCase()) {
+          item.classList.add("current-player");
+          item.setAttribute("aria-current", "true");
+        }
         item.append(rank, name, points);
         leaderboardList.append(item);
       });
@@ -648,6 +752,7 @@
       localStorage.setItem("sakuraSkyDashLeaderboard", JSON.stringify(leaderboard.slice(0, 20)));
       bestScore = leaderboard[0]?.score || 0;
       renderLeaderboard();
+      void submitSharedScore(score);
       return true;
     }
 
@@ -669,10 +774,15 @@
     }
 
     function resizeCanvas() {
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(canvas.clientWidth * ratio);
-      canvas.height = Math.round(canvas.clientHeight * ratio);
-      world.width = world.height * canvas.clientWidth / canvas.clientHeight;
+      const displayWidth = canvas.clientWidth;
+      const displayHeight = canvas.clientHeight;
+      if (!displayWidth || !displayHeight) return;
+      const ratio = Math.min(window.devicePixelRatio || 1, 3);
+      const backingWidth = Math.round(displayWidth * ratio);
+      const backingHeight = Math.round(displayHeight * ratio);
+      if (canvas.width !== backingWidth) canvas.width = backingWidth;
+      if (canvas.height !== backingHeight) canvas.height = backingHeight;
+      world.width = world.height * displayWidth / displayHeight;
       bird.x = world.width * 0.28;
       context.setTransform(canvas.width / world.width, 0, 0, canvas.height / world.height, 0, 0);
     }
@@ -708,14 +818,16 @@
       state = "over";
       const previousOverallBest = bestScore;
       const playerImproved = savePlayerScore();
+      const playerRank = leaderboard.findIndex(entry => entry.name.toLocaleLowerCase() === activeNickname.toLocaleLowerCase());
+      const rankMessage = playerRank >= 0 ? ` Rank #${playerRank + 1}.` : "";
       bestScoreElement.textContent = bestScore;
       finalScoreElement.textContent = score;
       finalBestElement.textContent = bestScore;
       playerResult.textContent = score > previousOverallBest
-        ? `New high score for ${activeNickname}!`
+        ? `New high score for ${activeNickname}!${rankMessage}`
         : playerImproved
-          ? `${activeNickname}'s new personal best!`
-          : `${activeNickname}'s score`;
+          ? `${activeNickname}'s new personal best!${rankMessage}`
+          : `${activeNickname}'s score.${rankMessage}`;
       playTone(145, 0.18, "sawtooth");
       window.setTimeout(() => gameOverOverlay.classList.add("visible"), 320);
     }
@@ -800,6 +912,10 @@
 
     function update(delta) {
       idleTime += delta;
+      if (idleTime >= nextBlinkAt) {
+        blinkStartedAt = idleTime;
+        nextBlinkAt = idleTime + 1.8 + Math.random() * 3.2;
+      }
       if (state !== "playing") return;
 
       bird.velocity += 1180 * delta;
@@ -830,6 +946,12 @@
 
       while (pipes.length && pipes[0].x + pipes[0].width < -10) pipes.shift();
       if (bird.y + bird.radius >= world.height - world.groundHeight || bird.y - bird.radius <= 0) endGame();
+    }
+
+    function getBlinkAmount() {
+      const blinkElapsed = idleTime - blinkStartedAt;
+      if (blinkElapsed < 0 || blinkElapsed > 0.16) return 0;
+      return Math.sin(blinkElapsed / 0.16 * Math.PI);
     }
 
     function roundedRect(x, y, width, height, radius) {
@@ -1113,20 +1235,23 @@
 
       // Large eye and determined brow
       const eyeY = -5 - jumpPower;
-      const eyeHeight = 8 + jumpPower * 2;
+      const blinkAmount = getBlinkAmount();
+      const eyeHeight = Math.max(0.7, (8 + jumpPower * 2) * (1 - blinkAmount));
       context.fillStyle = css.surface;
       context.beginPath();
       context.ellipse(10, eyeY, 6 + jumpPower, eyeHeight, 0.15, 0, Math.PI * 2);
       context.fill();
       context.stroke();
-      context.fillStyle = css.text;
-      context.beginPath();
-      context.arc(12, -4 - jumpPower * 2, 3 + jumpPower * 0.5, 0, Math.PI * 2);
-      context.fill();
-      context.fillStyle = css.surface;
-      context.beginPath();
-      context.arc(13, -6 - jumpPower * 2, 1.2 + jumpPower * 0.4, 0, Math.PI * 2);
-      context.fill();
+      if (blinkAmount < 0.72) {
+        context.fillStyle = css.text;
+        context.beginPath();
+        context.arc(12, -4 - jumpPower * 2, (3 + jumpPower * 0.5) * (1 - blinkAmount), 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = css.surface;
+        context.beginPath();
+        context.arc(13, -6 - jumpPower * 2, (1.2 + jumpPower * 0.4) * (1 - blinkAmount), 0, Math.PI * 2);
+        context.fill();
+      }
 
       context.strokeStyle = css.text;
       context.lineWidth = 2;
@@ -1200,11 +1325,14 @@
       startOverlay.classList.add("visible");
       hint.hidden = false;
       renderLeaderboard();
+      void loadSharedLeaderboard();
       nicknameInput.focus();
     });
     canvas.addEventListener("pointerdown", handleAction);
     window.addEventListener("keydown", handleAction);
     window.addEventListener("resize", resizeCanvas);
+    window.visualViewport?.addEventListener("resize", resizeCanvas);
+    new ResizeObserver(resizeCanvas).observe(canvas);
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
       refreshColors();
       draw();
@@ -1216,6 +1344,7 @@
       else if (state !== "ready") startMusic();
       soundOnIcon.hidden = muted;
       soundOffIcon.hidden = !muted;
+      soundButton.classList.toggle("is-muted", muted);
       soundButton.setAttribute("aria-label", muted ? "Turn on sound" : "Mute sound");
       soundButton.title = muted ? "Turn on sound" : "Mute sound";
     });
@@ -1223,6 +1352,7 @@
     nicknameInput.value = activeNickname;
     bestScoreElement.textContent = bestScore;
     renderLeaderboard();
+    void loadSharedLeaderboard();
     refreshColors();
     resizeCanvas();
     resetGame();
