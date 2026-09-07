@@ -969,20 +969,41 @@
       const groundY = world.height - world.groundHeight;
       context.fillStyle = css.text;
       context.fillRect(0, groundY, world.width, world.groundHeight);
-      context.strokeStyle = css.accent;
-      context.lineWidth = 6;
-      context.beginPath();
-      context.moveTo(0, groundY + 3);
-      context.lineTo(world.width, groundY + 3);
-      context.stroke();
 
-      context.strokeStyle = css.border;
-      context.lineWidth = 3;
-      for (let x = -50; x < world.width + 70; x += 52) {
-        const shiftedX = x - ((idleTime * 38) % 52);
+      const tileWidth = 44;
+      const tileShift = (idleTime * 38) % tileWidth;
+      for (let row = 0; row < 3; row += 1) {
+        const tileY = groundY + 9 + row * 21;
+        const rowOffset = row % 2 ? tileWidth / 2 : 0;
+        for (let x = -tileWidth * 2; x < world.width + tileWidth; x += tileWidth) {
+          const tileX = x + rowOffset - tileShift;
+          context.fillStyle = row % 2 ? css.border : css.surfaceSoft;
+          context.strokeStyle = css.text;
+          context.lineWidth = 2;
+          context.beginPath();
+          context.moveTo(tileX, tileY);
+          context.lineTo(tileX + tileWidth, tileY);
+          context.lineTo(tileX + tileWidth - 4, tileY + 18);
+          context.quadraticCurveTo(tileX + tileWidth / 2, tileY + 27, tileX + 4, tileY + 18);
+          context.closePath();
+          context.fill();
+          context.stroke();
+        }
+      }
+
+      context.fillStyle = css.accent;
+      context.fillRect(0, groundY, world.width, 8);
+      context.fillRect(0, groundY + world.groundHeight - 10, world.width, 10);
+
+      context.fillStyle = css.warning;
+      for (let x = 12 - tileShift; x < world.width + 20; x += tileWidth) {
         context.beginPath();
-        context.arc(shiftedX, groundY + 22, 34, Math.PI, 0);
-        context.stroke();
+        context.moveTo(x, groundY + 4);
+        context.lineTo(x + 5, groundY);
+        context.lineTo(x + 10, groundY + 4);
+        context.lineTo(x + 5, groundY + 8);
+        context.closePath();
+        context.fill();
       }
     }
 
