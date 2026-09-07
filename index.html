@@ -335,14 +335,38 @@
     .leaderboard-list li {
       min-height: 30px;
       display: grid;
-      grid-template-columns: 28px 1fr auto;
+      grid-template-columns: 48px 1fr auto;
       align-items: center;
       border-bottom: 1px solid var(--cp-border);
       font-size: 0.85rem;
       font-weight: 700;
     }
 
-    .leaderboard-list .rank { color: var(--cp-accent); }
+    .leaderboard-list .rank {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--cp-accent);
+    }
+
+    .champion-shuriken {
+      position: relative;
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      clip-path: polygon(50% 0, 61% 37%, 100% 50%, 63% 61%, 50% 100%, 39% 63%, 0 50%, 37% 39%);
+      background: var(--cp-warning);
+      filter: drop-shadow(1px 1px 0 var(--cp-text));
+      transform: rotate(12deg);
+    }
+
+    .champion-shuriken::after {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: var(--cp-text);
+      content: "";
+    }
     .leaderboard-list .points { font-weight: 900; }
     .leaderboard-list li:nth-child(-n + 3) .rank,
     .leaderboard-list li:nth-child(-n + 3) .points { color: var(--cp-warning); }
@@ -738,6 +762,14 @@
         rank.className = "rank";
         points.className = "points";
         rank.textContent = `${index + 1}.`;
+        if (index === 0) {
+          const championBadge = document.createElement("span");
+          championBadge.className = "champion-shuriken";
+          championBadge.setAttribute("role", "img");
+          championBadge.setAttribute("aria-label", "Top scorer");
+          championBadge.title = "Top scorer";
+          rank.append(championBadge);
+        }
         name.textContent = entry.name;
         points.textContent = entry.score;
         if (activeNickname && entry.name.toLocaleLowerCase() === activeNickname.toLocaleLowerCase()) {
