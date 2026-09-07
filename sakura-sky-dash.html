@@ -357,7 +357,7 @@
       clip-path: polygon(50% 0, 61% 37%, 100% 50%, 63% 61%, 50% 100%, 39% 63%, 0 50%, 37% 39%);
       background: var(--cp-warning);
       filter: drop-shadow(1px 1px 0 var(--cp-text));
-      transform: rotate(12deg);
+      animation: shuriken-spin 1.6s linear infinite;
     }
 
     .champion-shuriken::after {
@@ -481,6 +481,11 @@
       to { transform: translateX(320%); }
     }
 
+    @keyframes shuriken-spin {
+      from { transform: rotate(12deg); }
+      to { transform: rotate(372deg); }
+    }
+
     .results {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -558,6 +563,7 @@
     @media (prefers-reduced-motion: reduce) {
       .overlay, .panel { transition: none; }
       .splash-mark, .loading-bar { animation: none; }
+      .champion-shuriken { animation: none; transform: rotate(12deg); }
     }
   </style>
 </head>
