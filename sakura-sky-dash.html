@@ -1344,7 +1344,10 @@
       if (event.type === "keydown" && !["Space", "ArrowUp", "KeyW", "Enter"].includes(event.code)) return;
       if (event.target.closest?.("button, input")) return;
       event.preventDefault();
-      if (state === "playing") flap();
+      if (state === "playing") {
+        if (event.type === "pointerdown" && event.pointerType === "touch") navigator.vibrate?.(12);
+        flap();
+      }
     }
 
     playerForm.addEventListener("submit", event => {
